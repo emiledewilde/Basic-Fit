@@ -1,0 +1,37 @@
+<?php
+SESSION_START();
+require_once'DBCONFIG.php';
+if(isset($_POST["wachtwoordwijzigen"]))
+{
+	if($_POST['wachtwoord1']==$_POST['wachtwoord2'])
+	{
+		try
+		{
+			$ww = password_hash($_POST['wachtwoord1'], PASSWORD_DEFAULT);
+			$sQuery= "UPDATE admindata SET Wachtwoord = :Wachtwoord WHERE Adminnummer = :Adminnummer";
+			$oStmt = $db->prepare($sQuery);
+			$oStmt->bindValue(':Adminnummer', $_SESSION['Adminnummer'], PDO::PARAM_INT);
+			$oStmt->bindValue(':Wachtwoord', $ww, PDO::PARAM_STR);
+			$oStmt->execute();
+			echo "<p>wijziging is succesvol</p>";
+		}
+			catch(PDOException $e)
+			{
+					$sMsg='<p>
+					Regelnummer:'.$e->getLine().'<br/>
+					Bestand:'.$e->getFile().'<br/>
+					Foutmelding:'.$e->getMessage().'
+					</p>';
+					trigger_error($sMsg);
+			}
+		}
+		else
+		{
+			header('Refresh: 3; url=BasicFit.html');
+			echo 'Wachtwoord1 en Wachtwoord2 zijn niet gelijk!';
+		}
+		
+
+}
+?>
+<a href="klantmenu.php"><input type ="button" value = "Terug naar menu"></a>		
